@@ -3,5 +3,5 @@ author: kaz
 description: a boring guy's site
 markdown: kramdown
 permalink: pretty
-plugings:
+plugings: 
 -jeckll-feed
