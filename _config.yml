@@ -1,3 +1,7 @@
-theme: hacker
+theme: jekyll-theme-hacker
 author: kaz
 description: a boring guy's site
+markdown: kramdown
+permalink: pretty
+plugings:
+-jeckll-feed
