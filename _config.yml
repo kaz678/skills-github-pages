@@ -4,4 +4,4 @@ description: a boring guy's site
 markdown: kramdown
 permalink: pretty
 plugings: 
--jeckll-feed
+- jeckyll-feed
