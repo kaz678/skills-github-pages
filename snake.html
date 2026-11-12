@@ -101,7 +101,13 @@
             return false;
         }
 
-        init();
+        document.addEventListener("keydown", function(event) {
+    if(!game) {
+        if([37, 38, 39, 40].includes(event.keyCode)) {
+            init();
+        }
+    }
+});
     </script>
 </body>
 </html>
