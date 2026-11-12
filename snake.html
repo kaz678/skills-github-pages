@@ -10,6 +10,7 @@
             font-family: monospace;
             text-align: center;
             margin-top: 20px;
+            overflow: hidden; 
         }
         canvas {
             border: 2px solid #4af626;
@@ -21,7 +22,7 @@
 </head>
 <body>
 
-    <div class="info">得分: <span id="score">0</span> | 按方向键开始</div>
+    <div class="info">得分: <span id="score">0</span> | 按方向键开始 / 空格键重开</div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
 
     <script>
@@ -30,32 +31,69 @@
         const scoreSpan = document.getElementById('score');
 
         const box = 20; 
-        let snake, direction, food, score, game;
+        let snake, direction, food, score;
+        let game = null; // 用来存计时器
+        let isGameOver = false; // 记录游戏是否结束
 
+        // 初始化游戏
         function init() {
             snake = [{x: 200, y: 200}, {x: 180, y: 200}, {x: 160, y: 200}];
             direction = "RIGHT";
             food = {x: 100, y: 100};
             score = 0;
+            isGameOver = false;
             scoreSpan.innerText = score;
+            
+            // 保险起见，启动前先清空之前的计时器
             if(game) clearInterval(game);
-            game = setInterval(draw, 100);
+            game = setInterval(draw, 100); 
         }
 
+        // 监听键盘事件
         document.addEventListener("keydown", function(event) {
+            // 1. 拦截方向键和空格键，防止网页滚动
+            if([32, 37, 38, 39, 40].includes(event.keyCode)) {
+                event.preventDefault();
+            }
+
+            // 2. 如果游戏已经结束，按空格键重开
+            if(isGameOver) {
+                if(event.keyCode === 32) { // 32是空格键
+                    init();
+                }
+                return; // 游戏结束状态下，忽略其他按键
+            }
+
+            // 3. 如果游戏还没开始，按方向键启动
+            if(!game) {
+                if([37, 38, 39, 40].includes(event.keyCode)) {
+                    // 修正方向，防止一开始就撞墙
+                    if(event.keyCode === 38) direction = "UP";
+                    if(event.keyCode === 40) direction = "DOWN";
+                    if(event.keyCode === 37) direction = "LEFT";
+                    if(event.keyCode === 39) direction = "RIGHT";
+                    init();
+                }
+                return;
+            }
+
+            // 4. 游戏进行中，控制方向（防止反向掉头）
             if(event.keyCode === 37 && direction !== "RIGHT") direction = "LEFT";
             if(event.keyCode === 38 && direction !== "DOWN") direction = "UP";
             if(event.keyCode === 39 && direction !== "LEFT") direction = "RIGHT";
             if(event.keyCode === 40 && direction !== "UP") direction = "DOWN";
         });
 
+        // 渲染画面
         function draw() {
             ctx.fillStyle = "#000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // 画食物
             ctx.fillStyle = "#ff0044"; 
             ctx.fillRect(food.x, food.y, box, box);
 
+            // 画蛇
             for(let i = 0; i < snake.length; i++) {
                 ctx.fillStyle = i === 0 ? "#4af626" : "#228b22"; 
                 ctx.fillRect(snake[i].x, snake[i].y, box, box);
@@ -71,6 +109,7 @@
             if(direction === "RIGHT") snakeX += box;
             if(direction === "DOWN") snakeY += box;
 
+            // 吃到食物
             if(snakeX === food.x && snakeY === food.y) {
                 score++;
                 scoreSpan.innerText = score;
@@ -84,10 +123,12 @@
 
             let newHead = {x: snakeX, y: snakeY};
 
+            // 撞墙或撞自己
             if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
                 clearInterval(game);
-                setTimeout(() => alert("Game Over! 得分: " + score), 10);
-                setTimeout(init, 100);
+                game = null; 
+                isGameOver = true; // 标记游戏结束
+                setTimeout(() => alert("Game Over! 得分: " + score + "\n按空格键重新开始"), 10);
                 return;
             }
 
@@ -100,14 +141,6 @@
             }
             return false;
         }
-
-        document.addEventListener("keydown", function(event) {
-    if(!game) {
-        if([37, 38, 39, 40].includes(event.keyCode)) {
-            init();
-        }
-    }
-});
     </script>
 </body>
 </html>
