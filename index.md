@@ -12,4 +12,4 @@ hello,sweetie!
 
 ### 贪吃蛇？！
 
-<iframe src="/snake.html" width="100%" height="500" style="border: 2px solid #4af626; border-radius: 10px; margin-top: 20px;"></iframe>
+<iframe src="./snake.html" width="100%" height="500" style="border: 2px solid #4af626; border-radius: 10px; margin-top: 20px;"></iframe>
